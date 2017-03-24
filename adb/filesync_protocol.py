@@ -172,7 +172,7 @@ class FileSyncConnection(object):
       self._Flush()
 
     # Read one filesync packet off the recv buffer.
-    header_data = self._ReadBuffered(self.recv_header_len).encode('utf8')
+    header_data = self._ReadBuffered(self.recv_header_len)
     header = struct.unpack(self.recv_header_format, header_data)
     # Header is (ID, ...).
     command_id = self.wire_to_id[header[0]]
