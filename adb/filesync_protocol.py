@@ -142,7 +142,7 @@ class FileSyncConnection(object):
 
     # Receiving
     self.recv_buffer = ''
-    self.recv_header_format = recv_header_format.encode('utf8')
+    self.recv_header_format = recv_header_format
     self.recv_header_len = struct.calcsize(recv_header_format)
 
   def Send(self, command_id, data='', size=0):
@@ -157,7 +157,6 @@ class FileSyncConnection(object):
       size: Optionally override size from len(data).
     """
     if data:
-      data = data.encode('utf8')
       size = len(data)
 
     if not self._CanAddToSendBuffer(len(data)):
