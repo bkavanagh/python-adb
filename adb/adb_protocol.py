@@ -184,9 +184,14 @@ class AdbMessage(object):
   @staticmethod
   def CalculateChecksum(data):
     # The checksum is just a sum of all the bytes. I swear.
-    if isinstance(data, bytes):
-        return sum(map(ord, data.decode('ascii'))) & 0xFFFFFFFF
-    return sum(map(ord, data)) & 0xFFFFFFFF
+    if isinstance(data, bytearray):
+        return sum(data) & 0xFFFFFFFF
+    if isinstance(data, str):
+        try:
+            return sum(map(ord, data.decode('ascii'))) & 0xFFFFFFFF
+        except:
+            return sum(bytearray(data)) & 0xFFFFFFFF
+    return sum(map(ord, data)) & 0xFFFFFFFFF
 
   def Pack(self):
     """Returns this message in an over-the-wire format."""
@@ -291,7 +296,7 @@ class AdbMessage(object):
           raise InvalidResponseError(
               'Unknown AUTH response: %s %s %s' % (arg0, arg1, banner))
 
-        signed_token = rsa_key.Sign(banner)
+        signed_token = rsa_key.Sign(str(banner))
         msg = cls(
             command='AUTH', arg0=AUTH_SIGNATURE, arg1=0, data=signed_token)
         msg.Send(usb)
@@ -398,4 +403,4 @@ class AdbMessage(object):
     connection = cls.Open(usb, destination='%s:%s' % (service, command),
                           timeout_ms=timeout_ms)
     for data in connection.ReadUntilClose():
-      yield data
+      yield str(data)
